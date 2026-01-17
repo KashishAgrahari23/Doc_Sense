@@ -17,10 +17,17 @@ export async function POST(req) {
   const text = await extractTextFromFile(buffer, file.type);
 
   return new Response(
-    JSON.stringify({
-      success: true,
-      textLength: text.length,
-    }),
-    { headers: { "Content-Type": "application/json" } }
-  );
+  JSON.stringify({
+    success: true,
+    file: {
+      name: file.name,
+      type: file.type,
+      size: file.size,
+    },
+    textLength: text.length,
+    preview: text.slice(0, 500), 
+  }),
+  { headers: { "Content-Type": "application/json" } }
+);
+
 }

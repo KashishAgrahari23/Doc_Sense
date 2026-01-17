@@ -59,6 +59,7 @@ const UploadFile = () => {
       }
 
       console.log("Upload success:", data);
+      console.log("Data:", data.preview);
       alert("File uploaded successfully!");
     } catch (err) {
       console.error(err);
