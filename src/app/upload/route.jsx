@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
+import { extractTextFromFile } from "@/lib/extractText";
 
-export const runtime = "nodejs"; // 🔴 IMPORTANT
+export const runtime = "nodejs"; 
 
 export async function POST(req) {
   try {
@@ -16,13 +17,8 @@ export async function POST(req) {
 
     // Convert file to Buffer (Node.js)
     const buffer = Buffer.from(await file.arrayBuffer());
-
-    console.log("File received:", {
-      name: file.name,
-      type: file.type,
-      size: file.size,
-      bufferSize: buffer.length,
-    });
+    const text = await extractTextFromFile(buffer, file.type);
+    console.log("Extracted text length:", text.length);
 
     return NextResponse.json({
       success: true,
@@ -31,6 +27,8 @@ export async function POST(req) {
         type: file.type,
         size: file.size,
       },
+      textPreview: text.slice(0, 500), 
+      textLength: text.length,
     });
   } catch (error) {
     console.error("UPLOAD ERROR:", error);
