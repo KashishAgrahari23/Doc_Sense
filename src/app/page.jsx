@@ -1,18 +1,32 @@
+"use client";
+
 import UploadFile from "@/components/UploadFile";
 import ChatPanel from "@/components/ChatPanel";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
+import { useDocumentStatus } from "@/hooks/useDocumentStatus";
 
 export default function Home() {
+  const { loading, document } = useDocumentStatus();
+
   return (
     <>
       {/* SIGNED IN APP */}
       <SignedIn>
-        <div className="max-w-7xl mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <UploadFile />
-          <div className="md:col-span-2">
-            <ChatPanel />
+        {loading ? (
+          <div className="h-screen flex items-center justify-center text-gray-500">
+            Checking document status...
           </div>
-        </div>
+        ) : (
+          <div className="max-w-7xl mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Upload always enabled */}
+            <UploadFile />
+
+            {/* Chat enabled only if document exists */}
+            <div className="md:col-span-2">
+              <ChatPanel enabled={!!document} />
+            </div>
+          </div>
+        )}
       </SignedIn>
 
       {/* SIGNED OUT LANDING */}
@@ -24,6 +38,7 @@ export default function Home() {
 
           <p className="text-gray-600 text-lg mb-8">
             Upload PDFs or Word files and ask questions.
+            <br />
             DocSense answers strictly from your document — no hallucinations.
           </p>
 
@@ -68,8 +83,8 @@ export default function Home() {
 
 function Feature({ title, desc }) {
   return (
-    <div className="bg-blue-950 border rounded-xl p-6 shadow-sm">
-      <h3 className="font-semibold mb-2">{title}</h3>
+    <div className="bg-blue-950 border border-blue-900 rounded-xl p-6 shadow-sm">
+      <h3 className="font-semibold mb-2 text-white">{title}</h3>
       <p className="text-sm text-gray-300">{desc}</p>
     </div>
   );
