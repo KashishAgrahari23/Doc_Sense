@@ -1,13 +1,13 @@
 import { getDocument } from "@/lib/documentStore";
+import { askGroq } from "@/lib/groq";
 
 export const runtime = "nodejs";
 
 export async function POST(req) {
   try {
-    const body = await req.json();
-    const { question } = body;
+    const { question } = await req.json();
 
-    if (!question) {
+    if (!question || !question.trim()) {
       return new Response(
         JSON.stringify({ error: "Question is required" }),
         { status: 400 }
@@ -18,22 +18,12 @@ export async function POST(req) {
 
     if (!doc) {
       return new Response(
-        JSON.stringify({ error: "No document loaded" }),
+        JSON.stringify({ error: "No document uploaded" }),
         { status: 400 }
       );
     }
 
-    // 👇 ECHO RESPONSE (NO AI YET)
-    const answer = `
-You asked:
-"${question}"
-
-Document info:
-- File: ${doc.meta.name}
-- Characters: ${doc.text.length}
-
-(This is a placeholder response)
-`;
+    const answer = await askGroq(doc.text, question);
 
     return new Response(
       JSON.stringify({
@@ -42,6 +32,7 @@ Document info:
       }),
       { headers: { "Content-Type": "application/json" } }
     );
+
   } catch (err) {
     console.error("CHAT ERROR:", err);
 
