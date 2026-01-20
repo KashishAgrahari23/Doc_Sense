@@ -66,7 +66,7 @@ const UploadFile = () => {
       alert("Upload failed");
     }
   };
-
+    
   return (
     <div className="bg-white rounded-xl border shadow-sm p-6 flex flex-col gap-6">
       {/* Header */}
