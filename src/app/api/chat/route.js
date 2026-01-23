@@ -1,5 +1,7 @@
 import { getDocument } from "@/lib/documentStore";
+import { findRelevantChunk } from "@/lib/findRelevantChunk";
 import { askGroq } from "@/lib/groq";
+
 
 export const runtime = "nodejs";
 
@@ -22,16 +24,20 @@ export async function POST(req) {
         { status: 400 }
       );
     }
-
-    const answer = await askGroq(doc.text, question);
+    const {chunk , index} = findRelevantChunk(chunks,question)
+    const answer = await askGroq(chunk, question);
 
     return new Response(
-      JSON.stringify({
-        success: true,
-        answer,
-      }),
-      { headers: { "Content-Type": "application/json" } }
-    );
+  JSON.stringify({
+    success: true,
+    answer,
+    source: {
+      chunkIndex: index,
+      preview: chunk.slice(0, 300),
+    },
+  }),
+  { headers: { "Content-Type": "application/json" } }
+);
 
   } catch (err) {
     console.error("CHAT ERROR:", err);
