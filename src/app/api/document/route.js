@@ -12,12 +12,19 @@ export async function GET() {
     );
   }
 
+  
+  const preview = doc.docs
+    .slice(0, 2)
+    .map(d => d.pageContent)
+    .join("\n\n")
+    .slice(0, 500);
+
   return new Response(
     JSON.stringify({
       success: true,
       meta: doc.meta,
-      textLength: doc.text.length,
-      preview: doc.text.slice(0, 500),
+      documents: doc.docs.length,
+      preview,
     }),
     { headers: { "Content-Type": "application/json" } }
   );

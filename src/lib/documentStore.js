@@ -1,9 +1,9 @@
 
 let currentDocument = null;
 
-export function setDocument(text, meta = {}) {
+export function setDocument(docs, meta = {}) {
   currentDocument = {
-    text,
+    docs,
     meta,
     createdAt: new Date(),
   };

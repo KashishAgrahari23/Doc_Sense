@@ -1,4 +1,4 @@
-import { extractTextFromFile } from "@/lib/extractText";
+import { loadDocument } from "@/lib/loadDocument";
 import { setDocument } from "@/lib/documentStore";
 
 export const runtime = "nodejs";
@@ -16,19 +16,24 @@ export async function POST(req) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const text = await extractTextFromFile(buffer, file.type);
 
-    setDocument(text, {
+    const docs = await loadDocument(
+      buffer,
+      file.type,
+      file.name
+    );
+
+    // Store LangChain Documents, not raw text
+    setDocument(docs, {
       name: file.name,
       type: file.type,
-      size: file.size,
+      pages: docs.length,
     });
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: "Document stored in memory",
-        textLength: text.length,
+        pages: docs.length,
       }),
       { headers: { "Content-Type": "application/json" } }
     );
