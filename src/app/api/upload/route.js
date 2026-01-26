@@ -1,5 +1,6 @@
 import { loadDocument } from "@/lib/loadDocument";
 import { setDocument } from "@/lib/documentStore";
+import { splitDocuments } from "@/lib/textSplitters";
 
 export const runtime = "nodejs";
 
@@ -15,25 +16,31 @@ export async function POST(req) {
       );
     }
 
+    
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    const docs = await loadDocument(
+  
+    const documents = await loadDocument(
       buffer,
       file.type,
       file.name
     );
 
-    // Store LangChain Documents, not raw text
-    setDocument(docs, {
+    // ✅ Split into chunks
+    const splitDocs = await splitDocuments(documents);
+
+    // ✅ Store in memory
+    setDocument(splitDocs, {
       name: file.name,
       type: file.type,
-      pages: docs.length,
+      size: file.size,
+      chunks: splitDocs.length,
     });
 
     return new Response(
       JSON.stringify({
         success: true,
-        pages: docs.length,
+        chunks: splitDocs.length,
       }),
       { headers: { "Content-Type": "application/json" } }
     );

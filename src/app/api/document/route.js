@@ -12,20 +12,17 @@ export async function GET() {
     );
   }
 
-  
-  const preview = doc.docs
-    .slice(0, 2)
-    .map(d => d.pageContent)
-    .join("\n\n")
-    .slice(0, 500);
-
   return new Response(
-    JSON.stringify({
-      success: true,
-      meta: doc.meta,
-      documents: doc.docs.length,
-      preview,
-    }),
-    { headers: { "Content-Type": "application/json" } }
-  );
+  JSON.stringify({
+    success: true,
+    meta: doc.meta,
+    documents: doc.docs.length,
+    chunks: doc.docs.map((d, i) => ({
+      index: i,
+      content: d.pageContent,
+    })),
+  }),
+  { headers: { "Content-Type": "application/json" } }
+);
+
 }
