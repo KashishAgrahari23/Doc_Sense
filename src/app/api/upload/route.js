@@ -1,6 +1,7 @@
 import { loadDocument } from "@/lib/loadDocument";
 import { setDocument } from "@/lib/documentStore";
 import { splitDocuments } from "@/lib/textSplitters";
+import { createVectorStore } from "@/lib/vectorStore";
 
 export const runtime = "nodejs";
 
@@ -28,7 +29,7 @@ export async function POST(req) {
 
     // ✅ Split into chunks
     const splitDocs = await splitDocuments(documents);
-
+    await createVectorStore(splitDocs);
     // ✅ Store in memory
     setDocument(splitDocs, {
       name: file.name,
