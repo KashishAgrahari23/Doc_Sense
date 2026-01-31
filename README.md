@@ -213,15 +213,3 @@ This project involved **real-world RAG challenges**, not just happy-path code.
 
 * LinkedIn: [https://www.linkedin.com/in/kashish-agrahari-0149862a8/]
 * GitHub: [https://github.com/KashishAgrahari23/Doc_Sense/]
-
----
-
-
-
-If asked:
-
-> *“What was the hardest part?”*
-
-Say:
-
-> *“Integrating LangChain reliably in a real backend — handling loaders, splitters, embeddings, and vector stores while debugging silent failures.”*
