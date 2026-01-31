@@ -211,8 +211,8 @@ This project involved **real-world RAG challenges**, not just happy-path code.
 
 **Kashish Agrahari**
 
-* LinkedIn: [https://linkedin.com/in/your-link](https://linkedin.com/in/your-link)
-* GitHub: [https://github.com/your-github](https://github.com/your-github)
+* LinkedIn: [https://www.linkedin.com/in/kashish-agrahari-0149862a8/]
+* GitHub: [https://github.com/KashishAgrahari23/Doc_Sense/]
 
 ---
 
