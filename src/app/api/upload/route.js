@@ -1,7 +1,10 @@
 import { loadDocument } from "@/lib/loadDocument";
-import { setDocument } from "@/lib/documentStore";
 import { splitDocuments } from "@/lib/textSplitters";
-import { createVectorStore } from "@/lib/vectorStore";
+import { addDocumentsToVectorStore } from "@/lib/vectorStore";
+
+import fs from "fs/promises";
+import path from "path";
+import os from "os";
 
 export const runtime = "nodejs";
 
@@ -17,26 +20,21 @@ export async function POST(req) {
       );
     }
 
-    
+    // 1️⃣ Convert file → buffer
     const buffer = Buffer.from(await file.arrayBuffer());
 
-  
+    // 2️⃣ Load document via LangChain loaders
     const documents = await loadDocument(
       buffer,
       file.type,
       file.name
     );
 
-    // ✅ Split into chunks
+    // 3️⃣ Split documents into chunks
     const splitDocs = await splitDocuments(documents);
-    await createVectorStore(splitDocs);
-    // ✅ Store in memory
-    setDocument(splitDocs, {
-      name: file.name,
-      type: file.type,
-      size: file.size,
-      chunks: splitDocs.length,
-    });
+
+    // 4️⃣ Store chunks into Chroma (embeddings happen here)
+    await addDocumentsToVectorStore(splitDocs);
 
     return new Response(
       JSON.stringify({

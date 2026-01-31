@@ -1,5 +1,6 @@
-import { HuggingFaceInferenceEmbeddings } from "@langchain/community/embeddings/hf";
+import { HuggingFaceTransformersEmbeddings }
+  from "@langchain/community/embeddings/transformers";
 
-export const embeddings = new HuggingFaceInferenceEmbeddings({
-  model: "sentence-transformers/all-MiniLM-L6-v2",
+export const embeddings = new HuggingFaceTransformersEmbeddings({
+  modelName: "sentence-transformers/all-MiniLM-L6-v2",
 });
