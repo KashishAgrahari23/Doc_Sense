@@ -2,10 +2,6 @@ import { loadDocument } from "@/lib/loadDocument";
 import { splitDocuments } from "@/lib/textSplitters";
 import { addDocumentsToVectorStore } from "@/lib/vectorStore";
 
-import fs from "fs/promises";
-import path from "path";
-import os from "os";
-
 export const runtime = "nodejs";
 
 export async function POST(req) {
@@ -14,45 +10,37 @@ export async function POST(req) {
     const file = formData.get("file");
 
     if (!file) {
-      return new Response(
-        JSON.stringify({ error: "No file uploaded" }),
-        { status: 400 }
-      );
+      return new Response(JSON.stringify({ error: "No file uploaded" }), {
+        status: 400,
+      });
     }
 
     // 1️⃣ Convert file → buffer
     const buffer = Buffer.from(await file.arrayBuffer());
 
     // 2️⃣ Load document via LangChain loaders
-    const documents = await loadDocument(
-      buffer,
-      file.type,
-      file.name
-    );
+    const documents = await loadDocument(buffer, file.type, file.name);
 
     // 3️⃣ Split documents into chunks
     const splitDocs = await splitDocuments(documents);
 
     // 4️⃣ Store chunks into Chroma (embeddings happen here)
     await addDocumentsToVectorStore(splitDocs);
-console.log("Docs loaded:", documents.length);
-console.log("Split chunks:", splitDocs.length);
-console.log("Sample chunk:", splitDocs[0]?.pageContent.slice(0, 200));
-
+    console.log("Docs loaded:", documents.length);
+    console.log("Split chunks:", splitDocs.length);
+    console.log("Sample chunk:", splitDocs[0]?.pageContent.slice(0, 200));
     return new Response(
       JSON.stringify({
         success: true,
         chunks: splitDocs.length,
       }),
-      { headers: { "Content-Type": "application/json" } }
+      { headers: { "Content-Type": "application/json" } },
     );
   } catch (err) {
     console.error("UPLOAD ERROR:", err);
 
-    return new Response(
-      JSON.stringify({ error: err.message }),
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+    });
   }
-  
 }
