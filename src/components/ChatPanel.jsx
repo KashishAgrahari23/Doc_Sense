@@ -2,61 +2,88 @@
 import { useState } from "react";
 
 export default function ChatPanel({ enabled }) {
-  const [message, setMessage] = useState("");
-  const [reply, setReply] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function sendMessage() {
-    if (!enabled || !message.trim()) return;
+    if (!enabled || !input.trim() || loading) return;
 
+    const userMessage = { role: "user", content: input };
+
+    // 1️⃣ Update UI immediately
+    setMessages(prev => [...prev, userMessage]);
+    setInput("");
     setLoading(true);
-    setReply("");
 
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: message }),
+        body: JSON.stringify({
+          question: userMessage.content,
+          history: messages.slice(-5), // 👈 last 5 turns
+        }),
       });
 
       const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data.error || "Chat failed");
-      }
+      if (!res.ok) throw new Error(data.error);
 
-      setReply(data.answer);
+      // 2️⃣ Add assistant response
+      setMessages(prev => [
+        ...prev,
+        { role: "assistant", content: data.answer },
+      ]);
     } catch (err) {
-      setReply("Error: " + err.message);
+      setMessages(prev => [
+        ...prev,
+        { role: "assistant", content: "Error: " + err.message },
+      ]);
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-xl border shadow-sm p-4">
-      <div className="flex-1 overflow-auto text-sm text-gray-700 whitespace-pre-wrap">
-        {!enabled ? (
+    <div className="bg-white rounded-xl border shadow-sm p-4 flex flex-col h-full">
+      {/* CHAT MESSAGES */}
+      <div className="flex-1 overflow-y-auto space-y-3 text-sm">
+        {!enabled && (
           <div className="h-full flex items-center justify-center text-gray-400">
             Upload a document to start chatting 📄
           </div>
-        ) : reply ? (
-          <p>{reply}</p>
-        ) : (
-          <p className="text-gray-400">
-            Ask a question about your document 👇
-          </p>
+        )}
+
+        {messages.map((msg, i) => (
+          <div
+            key={i}
+            className={`max-w-[75%] px-4 py-2 rounded-lg ${
+              msg.role === "user"
+                ? "ml-auto bg-indigo-600 text-white"
+                : "mr-auto bg-gray-100 text-gray-800"
+            }`}
+          >
+            {msg.content}
+          </div>
+        ))}
+
+        {loading && (
+          <div className="mr-auto bg-gray-100 text-gray-500 px-4 py-2 rounded-lg">
+            Thinking…
+          </div>
         )}
       </div>
 
+      {/* INPUT */}
       <div className="mt-4 flex gap-2">
         <input
           type="text"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          disabled={!enabled}
-          placeholder="Ask a question…"
-          className="flex-1 rounded-lg border px-3 py-2 text-sm"
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          disabled={!enabled || loading}
+          placeholder="Ask something about the document…"
+          className="flex-1 rounded-lg border px-3 py-2 text-sm disabled:bg-gray-100"
         />
 
         <button
@@ -64,7 +91,7 @@ export default function ChatPanel({ enabled }) {
           disabled={!enabled || loading}
           className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm disabled:opacity-50"
         >
-          {loading ? "..." : "Send"}
+          Send
         </button>
       </div>
     </div>

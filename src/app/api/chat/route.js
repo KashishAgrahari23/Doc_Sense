@@ -5,54 +5,70 @@ export const runtime = "nodejs";
 
 export async function POST(req) {
   try {
-    const { question } = await req.json();
+    const { question, history = [] } = await req.json();
 
-    if (!question || !question.trim()) {
-      return new Response(
-        JSON.stringify({ error: "Question is required" }),
-        { status: 400 }
-      );
+    if (!question?.trim()) {
+      return new Response(JSON.stringify({ error: "Question is required" }), {
+        status: 400,
+      });
     }
 
-    // 1️⃣ Get Chroma vector store
+    // 1️⃣ Semantic search
     const vectorStore = await getVectorStore();
+    // Build contextual question using memory
+    const contextualQuestion = history.length
+      ? `
+Previous conversation:
+${history
+  .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`)
+  .join("\n")}
 
-    // 2️⃣ Semantic search
-    const results = await vectorStore.similaritySearch(question, 4);
+Current question:
+${question}
+`
+      : question;
+
+    // 🔥 Use contextualized question for retrieval
+    const results = await vectorStore.similaritySearch(contextualQuestion, 4);
 
     if (!results.length) {
       return new Response(
-        JSON.stringify({ error: "No documents indexed yet" }),
-        { status: 400 }
+        JSON.stringify({ error: "No relevant context found" }),
+        { status: 400 },
       );
     }
 
-    // 3️⃣ Combine context
-    const context = results
-      .map((doc, i) => `Chunk ${i + 1}:\n${doc.pageContent}`)
-      .join("\n\n");
+    // 2️⃣ Build context
+    const context = results.map((r) => r.pageContent).join("\n\n");
 
-    // 4️⃣ Ask Groq
-    const answer = await askGroq(context, question);
+    // 3️⃣ Build conversation memory
+    const conversation = history
+      .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`)
+      .join("\n");
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        answer,
-        sources: results.map((doc, i) => ({
-          chunkIndex: i,
-          preview: doc.pageContent.slice(0, 200),
-        })),
-      }),
-      { headers: { "Content-Type": "application/json" } }
+    // 4️⃣ Ask LLM
+    const answer = await askGroq(
+      `
+You are an AI assistant. Answer ONLY from the context.
+
+Conversation so far:
+${conversation}
+
+Context:
+${context}
+
+User question:
+${question}
+`,
     );
 
+    return new Response(JSON.stringify({ success: true, answer }), {
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (err) {
     console.error("CHAT ERROR:", err);
-
-    return new Response(
-      JSON.stringify({ error: err.message }),
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+    });
   }
 }
