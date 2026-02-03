@@ -19,15 +19,17 @@ The system is designed to avoid hallucinations by retrieving relevant document c
 ---
 
 ## 🏗️ Architecture Overview
-
 ```
-User → Upload Document
-     → Document Loader (PDF / DOCX)
-     → Text Splitter (RecursiveCharacterTextSplitter)
-     → Embeddings Generation
-     → Vector Store (Chroma)
-     → Query → Relevant Chunks
-     → LLM → Answer
+User
+ └─ Upload Document
+     └─ Document Loader (DOCX / PDF)
+         └─ Text Splitter (RecursiveCharacterTextSplitter)
+             └─ Embeddings Generation
+                 └─ Vector Store (Chroma)
+                     └─ Semantic Search
+                         └─ LLM (Groq)
+                             └─ Answer
+LLM → Answer
 ```
 
 ---
@@ -48,7 +50,8 @@ User → Upload Document
 
 * LangChain
 * Chroma Vector Database (Docker)
-* Hugging Face / Groq (LLM & embeddings)
+* Hugging Face (Embeddings)
+* Groq (LLM)
 * RecursiveCharacterTextSplitter
 
 ### Auth
@@ -79,7 +82,7 @@ src/
 
 ---
 
-## ⚙️ How It Works (Step-by-Step)
+##  How It Works (Step-by-Step)
 
 1. **Document Upload**
 
@@ -100,6 +103,7 @@ src/
 4. **Vector Storage**
 
    * Chunks + embeddings stored in **Chroma DB**
+   * Chroma runs inside Docker for persistence
 
 5. **Question Answering**
 
@@ -135,6 +139,7 @@ This project involved **real-world RAG challenges**, not just happy-path code.
   * Worker dependencies
   * DOM APIs not available in Node
 * **Solution:** Switched to `pdf2json` for reliable server-side PDF extraction
+* **Learning:** Document ingestion is often the hardest part of RAG systems
 
 ---
 
@@ -175,6 +180,7 @@ This project involved **real-world RAG challenges**, not just happy-path code.
 ### 6️⃣ Debugging Async Pipelines
 
 * Silent failures during upload and vector insertion
+→ split → embed → store
 * **Solution:** Added explicit backend logging at every pipeline stage
   (upload → load → split → embed → store)
 
@@ -204,6 +210,7 @@ This project involved **real-world RAG challenges**, not just happy-path code.
 * Source highlighting in UI
 * Caching embeddings for faster uploads
 * Multi-document support
+* Embedding caching for faster uploads
 
 ---
 
