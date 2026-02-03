@@ -35,6 +35,9 @@ export async function POST(req) {
 
     // 4️⃣ Store chunks into Chroma (embeddings happen here)
     await addDocumentsToVectorStore(splitDocs);
+console.log("Docs loaded:", documents.length);
+console.log("Split chunks:", splitDocs.length);
+console.log("Sample chunk:", splitDocs[0]?.pageContent.slice(0, 200));
 
     return new Response(
       JSON.stringify({
@@ -51,4 +54,5 @@ export async function POST(req) {
       { status: 500 }
     );
   }
+  
 }
