@@ -50,7 +50,7 @@ export default function ChatPanel({ enabled }) {
       {/* CHAT MESSAGES */}
       <div className="flex-1 overflow-y-auto space-y-3 text-sm">
         {!enabled && (
-          <div className="h-full flex items-center justify-center text-gray-400">
+          <div className="h-full flex items-center justify-center text-gray-900">
             Upload a document to start chatting 📄
           </div>
         )}
@@ -83,7 +83,7 @@ export default function ChatPanel({ enabled }) {
           onChange={e => setInput(e.target.value)}
           disabled={!enabled || loading}
           placeholder="Ask something about the document…"
-          className="flex-1 rounded-lg border px-3 py-2 text-sm disabled:bg-gray-100"
+          className="flex-1 rounded-lg border px-3 py-2 text-sm text-gray-900 disabled:bg-gray-100"
         />
 
         <button

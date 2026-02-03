@@ -73,7 +73,7 @@ const UploadFile = ({ onUploadSuccess }) => {
       {/* Header */}
       <div className="flex items-center gap-2">
         <FileText className="w-5 h-5 text-indigo-600" />
-        <h2 className="text-lg font-semibold">Your Document</h2>
+        <h2 className="text-lg text-gray-900 font-semibold">Your Document</h2>
       </div>
 
       {/* Upload Area */}
@@ -83,7 +83,7 @@ const UploadFile = ({ onUploadSuccess }) => {
           className="flex flex-col items-center justify-center gap-3 border-2 border-dashed border-gray-300 rounded-lg p-8 cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition"
         >
           <Upload className="w-8 h-8 text-gray-500" />
-          <p className="text-sm text-gray-600 text-center">
+          <p className="text-sm text-gray-900 text-center">
             Click to upload or drag & drop <br />
             <span className="text-xs text-gray-400">PDF, DOCX (Max 10MB)</span>
           </p>
@@ -104,7 +104,7 @@ const UploadFile = ({ onUploadSuccess }) => {
           <div className="flex items-center gap-3">
             <FileText className="w-5 h-5 text-indigo-600" />
             <div>
-              <p className="text-sm font-medium">{file.name}</p>
+              <p className="text-sm text-gray-900 font-medium">{file.name}</p>
               <p className="text-xs text-gray-500">
                 {(file.size / 1024 / 1024).toFixed(2)} MB
               </p>
