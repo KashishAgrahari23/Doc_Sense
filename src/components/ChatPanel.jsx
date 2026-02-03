@@ -34,27 +34,39 @@ export default function ChatPanel({ enabled }) {
   }
 
   return (
-    <div className="flex-1 overflow-auto text-sm text-gray-600 whitespace-pre-wrap">
-  {!enabled ? (
-    <div className="h-full flex items-center justify-center text-center text-gray-400">
-      Upload a document to start chatting 📄
+    <div className="flex flex-col h-full bg-white rounded-xl border shadow-sm p-4">
+      <div className="flex-1 overflow-auto text-sm text-gray-700 whitespace-pre-wrap">
+        {!enabled ? (
+          <div className="h-full flex items-center justify-center text-gray-400">
+            Upload a document to start chatting 📄
+          </div>
+        ) : reply ? (
+          <p>{reply}</p>
+        ) : (
+          <p className="text-gray-400">
+            Ask a question about your document 👇
+          </p>
+        )}
+      </div>
+
+      <div className="mt-4 flex gap-2">
+        <input
+          type="text"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          disabled={!enabled}
+          placeholder="Ask a question…"
+          className="flex-1 rounded-lg border px-3 py-2 text-sm"
+        />
+
+        <button
+          onClick={sendMessage}
+          disabled={!enabled || loading}
+          className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm disabled:opacity-50"
+        >
+          {loading ? "..." : "Send"}
+        </button>
+      </div>
     </div>
-  ) : answer ? (
-    <>
-      <p>{answer}</p>
-
-      {source && (
-        <div className="mt-3 text-xs text-gray-400 border-t pt-2">
-          <strong>Source:</strong> Chunk #{source.chunkIndex}
-        </div>
-      )}
-    </>
-  ) : (
-    <p className="text-gray-400">
-      Ask a question about your document 👇
-    </p>
-  )}
-</div>
-
   );
 }

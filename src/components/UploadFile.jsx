@@ -8,7 +8,7 @@ const ALLOWED_TYPES = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ];
 
-const UploadFile = () => {
+const UploadFile = ({ onUploadSuccess }) => {
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
 
@@ -59,7 +59,8 @@ const UploadFile = () => {
       }
 
       console.log("Upload success:", data);
-      console.log("Data:", data.preview);
+      // console.log("Data:", data.preview);
+      onUploadSuccess?.();
       alert("File uploaded successfully!");
     } catch (err) {
       console.error(err);
